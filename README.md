@@ -32,7 +32,7 @@ All** on the same page keeps it up to date.
 Or clone a release yourself:
 
 ```sh
-git clone --branch v0.1.0 https://github.com/ridumea/dms-marina-dock.git \
+git clone --branch v0.1.1 https://github.com/ridumea/dms-marina-dock.git \
     ~/.config/DankMaterialShell/plugins/MarinaDock
 dms ipc call plugin-scan scan
 dms ipc call plugins enable marina
