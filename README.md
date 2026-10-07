@@ -32,7 +32,7 @@ Or clone a release yourself:
 
 ```sh
 git clone --branch v0.1.0 https://github.com/ridumea/dms-marina-dock.git \
-    ~/.config/DankMaterialShell/plugins/Marina
+    ~/.config/DankMaterialShell/plugins/MarinaDock
 dms ipc call plugin-scan scan
 dms ipc call plugins enable marina
 ```
@@ -52,12 +52,13 @@ it, use its delete button in **Settings → Plugins**.
   stack or icon to stack it, off the dock to float it, onto the dock to tile
   it.
 
-To put Marina in your bar instead, set **Placement** to **In the bar** and add
-the Marina widget in **Settings → Bar → Widgets**, in the centre section.
+To put Marina Dock in your bar instead, set **Placement** to **In the bar** and
+add the Marina Dock widget in **Settings → Bar → Widgets**, in the centre
+section.
 
 ## Settings
 
-All in **Settings → Plugins → Marina**:
+All in **Settings → Plugins → Marina Dock**:
 
 | Setting | What it does |
 |---|---|

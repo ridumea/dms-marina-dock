@@ -43,7 +43,7 @@ PluginSettings {
         id: placementSetting
         settingKey: "placement"
         label: I18n.trFor("marina", "Placement")
-        description: I18n.trFor("marina", "In a bar, the dock takes the place of the Marina widget in the bar's layout. At the screen edge, it has its own window on every screen.")
+        description: I18n.trFor("marina", "In the bar, the dock shows where you add the Marina Dock widget to a bar. At the screen edge, it has its own window on every screen.")
         options: [
             {
                 "label": I18n.trFor("marina", "In the bar"),
@@ -60,7 +60,7 @@ PluginSettings {
     StyledText {
         visible: !root.edgePlacement
         width: parent.width
-        text: root.attachments.length > 0 ? I18n.trFor("marina", "In the bar: %1.").arg(root.attachments.map(a => a.bar + ", " + root.sectionName(a)).join("; ")) : I18n.trFor("marina", "Add the Marina widget to a bar in Settings → Bar → Widgets.")
+        text: root.attachments.length > 0 ? I18n.trFor("marina", "In the bar: %1.").arg(root.attachments.map(a => a.bar + ", " + root.sectionName(a)).join("; ")) : I18n.trFor("marina", "Add the Marina Dock widget to a bar in Settings → Bar → Widgets.")
         font.pixelSize: Theme.fontSizeSmall
         color: root.attachments.length > 0 ? Theme.surfaceVariantText : Theme.primary
         wrapMode: Text.WordWrap
@@ -69,7 +69,7 @@ PluginSettings {
     StyledText {
         visible: !root.edgePlacement && root.inSideSection
         width: parent.width
-        text: I18n.trFor("marina", "Icons magnify only in a bar's Center Section (Middle Section on a vertical bar). To magnify, move Marina there in Settings → Bar → Widgets.")
+        text: I18n.trFor("marina", "Icons magnify only in a bar's Center Section (Middle Section on a vertical bar). To magnify, move Marina Dock there in Settings → Bar → Widgets.")
         font.pixelSize: Theme.fontSizeSmall
         color: Theme.warning
         wrapMode: Text.WordWrap
