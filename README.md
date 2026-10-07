@@ -24,9 +24,10 @@ DankMaterialShell 1.6.2 and niri 25.08 or later.
 ## Install
 
 In DMS, open **Settings → Plugins** and add a registry with the name
-`ridumea` and the URL `https://github.com/ridumea/dms-registry.git`.
-Then click **Browse**, find **Marina Dock** and install it. **Update All** on
-the same page keeps it up to date.
+`ridumea` and the URL `https://github.com/ridumea/dms-registry.git`. Then
+click **Browse**, click **Show 3rd Party** and confirm (DMS hides plugins from
+other registries by default), find **Marina Dock** and install it. **Update
+All** on the same page keeps it up to date.
 
 Or clone a release yourself:
 
