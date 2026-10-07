@@ -43,7 +43,7 @@ PluginSettings {
         id: placementSetting
         settingKey: "placement"
         label: I18n.trFor("marina", "Placement")
-        description: I18n.trFor("marina", "In the bar, the dock shows where you add the Marina Dock widget to a bar. At the screen edge, it has its own window on every screen.")
+        description: I18n.trFor("marina", "In the bar: the dock appears in your bar, in the section where you placed the Marina Dock widget (Settings → Bar → Widgets). At the screen edge: the dock appears on its own along an edge of every screen.")
         options: [
             {
                 "label": I18n.trFor("marina", "In the bar"),
