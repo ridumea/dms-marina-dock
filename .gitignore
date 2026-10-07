@@ -1,0 +1,7 @@
+# Qt and Quickshell caches
+*.qmlc
+*.jsc
+.qmlls.ini
+
+# Node
+node_modules/

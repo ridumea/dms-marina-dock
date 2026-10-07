@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  # Run by the release workflow before it releases.
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: node --test tests/*.test.mjs
+
+  lint:
+    # Lints against the DMS and Quickshell packages users install, so the
+    # checks see the same types as the running shell. Fedora's packages are
+    # the ones that ship Quickshell's QML type information.
+    runs-on: ubuntu-latest
+    container: fedora:44
+    steps:
+      - run: |
+          dnf -y install 'dnf-command(copr)'
+          dnf -y copr enable avengemedia/danklinux
+          dnf -y copr enable avengemedia/dms
+          dnf -y install dms quickshell qt6-qtdeclarative-devel diffutils findutils
+      - uses: actions/checkout@v5
+      - run: tools/lint.sh

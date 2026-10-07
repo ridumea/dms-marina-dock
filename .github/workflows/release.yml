@@ -1,0 +1,122 @@
+name: Release
+
+# Releases happen only when started by hand, from dev, in the Actions tab or with
+#   gh workflow run release.yml --ref dev -f bump=patch
+# Work happens on dev; main holds the latest release, since DMS installs and
+# updates registry plugins from the default branch. The version lives in
+# plugin.json and follows Semantic Versioning; tags are vMAJOR.MINOR.PATCH.
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Which part of the version to raise
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  checks:
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    needs: checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Require the dev branch
+        if: github.ref_name != 'dev'
+        run: |
+          echo "Release from dev, not ${{ github.ref_name }}." >&2
+          exit 1
+
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Bump the version in plugin.json
+        id: version
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: |
+          # Only the version string changes, so the rest of the file keeps
+          # its formatting.
+          version=$(node -e '
+            const fs = require("fs");
+            const text = fs.readFileSync("plugin.json", "utf8");
+            // A SemVer core version: no leading zeros, no pre-release or build part.
+            const m = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.exec(JSON.parse(text).version || "");
+            if (!m) throw new Error("plugin.json version is not a MAJOR.MINOR.PATCH semantic version");
+            let [major, minor, patch] = m.slice(1).map(Number);
+            if (process.env.BUMP === "major") { major++; minor = 0; patch = 0; }
+            else if (process.env.BUMP === "minor") { minor++; patch = 0; }
+            else patch++;
+            const next = `${major}.${minor}.${patch}`;
+            fs.writeFileSync("plugin.json", text.replace(/("version"\s*:\s*")[^"]*(")/, `$1${next}$2`));
+            console.log(next);
+          ')
+          if git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
+            echo "Tag v$version already exists." >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Point the README's install command at the new release
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: sed -i -E "s/--branch v[0-9]+\.[0-9]+\.[0-9]+/--branch v$VERSION/" README.md
+
+      # Through the API, not git push: commits the API creates with the
+      # workflow's token are signed by GitHub, so they pass a rule requiring
+      # signed commits on the branch.
+      - name: Commit, move main and tag through the GitHub API
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          jq -n \
+            --arg repo "$GITHUB_REPOSITORY" \
+            --arg branch "$BRANCH" \
+            --arg head "$GITHUB_SHA" \
+            --arg message "Release v$VERSION" \
+            --arg manifest "$(base64 -w0 plugin.json)" \
+            --arg readme "$(base64 -w0 README.md)" \
+            '{
+              query: "mutation($input: CreateCommitOnBranchInput!) { createCommitOnBranch(input: $input) { commit { oid } } }",
+              variables: { input: {
+                branch: { repositoryNameWithOwner: $repo, branchName: $branch },
+                expectedHeadOid: $head,
+                message: { headline: $message },
+                fileChanges: { additions: [
+                  { path: "plugin.json", contents: $manifest },
+                  { path: "README.md", contents: $readme }
+                ] }
+              } }
+            }' > commit-request.json
+          commit=$(gh api graphql --input commit-request.json --jq '.data.createCommitOnBranch.commit.oid')
+          if [ -z "$commit" ] || [ "$commit" = "null" ]; then
+            echo "Creating the release commit failed." >&2
+            exit 1
+          fi
+          # Fast-forward only: fails rather than rewrite main if it has
+          # commits dev does not.
+          gh api -X PATCH "repos/$GITHUB_REPOSITORY/git/refs/heads/main" -f sha="$commit" -F force=false >/dev/null
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/v$VERSION" -f sha="$commit" >/dev/null
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: gh release create "v$VERSION" --title "v$VERSION" --generate-notes --verify-tag

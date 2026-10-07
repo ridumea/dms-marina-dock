@@ -1,0 +1,18 @@
+{
+    "id": "marina",
+    "name": "Marina Dock",
+    "description": "A dock for niri that mirrors your layout: column stacks, floating windows, drag to rearrange and magnification, at a screen edge or in a DMS bar",
+    "version": "0.0.0",
+    "author": "Raimond Dumea",
+    "license": "MIT",
+    "type": "composite",
+    "capabilities": ["daemon", "dankbar-widget"],
+    "components": {
+        "widget": "./MarinaWidget.qml",
+        "daemon": "./MarinaDaemon.qml"
+    },
+    "settings": "./MarinaSettings.qml",
+    "icon": "sailing",
+    "permissions": ["settings_read", "settings_write"],
+    "requires_dms": ">=1.6.2"
+}
