@@ -2,7 +2,7 @@
     "id": "marina",
     "name": "Marina Dock",
     "description": "A dock for niri that mirrors your layout: column stacks, floating windows, drag to rearrange and magnification, at a screen edge or in a DMS bar",
-    "version": "0.0.0",
+    "version": "0.1.0",
     "author": "Raimond Dumea",
     "license": "MIT",
     "type": "composite",
