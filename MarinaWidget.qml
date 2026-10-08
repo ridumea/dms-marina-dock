@@ -141,6 +141,8 @@ BasePill {
         let toplevels = CompositorService.sortedToplevels;
         if (!toplevels || toplevels.length === 0)
             return [];
+        if (CompositorService.isNiri && NiriService.windows)
+            toplevels = RowModel.dropClosed(toplevels, new Set(NiriService.windows.map(w => w.id)));
 
         const all = toplevels;
         if (_currentWorkspace)

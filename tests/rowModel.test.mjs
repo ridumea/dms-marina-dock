@@ -145,3 +145,16 @@ test("a moving window with no remembered place has no column", () => {
     const l = layoutOf([w(2)], [nw(2, null, null)], {});
     assert.deepEqual([l.keys[0], l.ws[0], l.kinds[0]], [null, null, "other"]);
 });
+
+import { dropClosed } from "../lib/rowModel.mjs";
+
+test("windows niri has closed are dropped before DMS catches up", () => {
+    const values = [w(1), w(9), w(2)];
+    assert.deepEqual(ids(dropClosed(values, new Set([1, 2]))), [1, 2]);
+});
+
+test("dropClosed keeps the list when every window is live, and unmatched toplevels", () => {
+    const values = [w(1), { "appId": "x" }];
+    assert.equal(dropClosed(values, new Set([1])), values);
+    assert.equal(dropClosed(values, new Set()).length, 1);
+});
